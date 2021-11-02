@@ -13,7 +13,10 @@ class BookShelf extends Component {
                     <ol className="books-grid">
                         {
                             bookList.map((book) => (
-                                <Book title={book.title} authors={book.authors} coverURL={book?.imageLinks?.thumbnail} />)
+                                <Book 
+                                key={book.id}
+                                book ={book}
+                                onChangeBookShelf={this.props.onChangeBookShelf}/>)
                             )
                         }
                     </ol>
@@ -25,7 +28,8 @@ class BookShelf extends Component {
 
 BookShelf.propTypes = {
     shelfHeader: PropTypes.string.isRequired,
-    bookList: PropTypes.array.isRequired
+    bookList: PropTypes.array.isRequired,
+    onChangeBookShelf: PropTypes.func.isRequired
 }
 
 export default BookShelf;

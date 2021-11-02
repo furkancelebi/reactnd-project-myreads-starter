@@ -13,7 +13,7 @@ class Search extends Component {
     }
 
     setBooksState(books) {
-
+        Array.isArray(books) ? this.setState(() => ({ books })) : this.setBooksState([]);
     }
 
     handleChange = (query) => {
@@ -21,18 +21,29 @@ class Search extends Component {
 
         query ? BooksAPI.search(query)
             .then((books) => (
-                this.setState(() => ({ books }))
+                this.setBooksState(books)
             ))
-            :
-            this.setState(() => ({ books: [] }))
+            : this.setBooksState([])
+    }
+
+    mergeWithUserBooks = () => {
+        return this.state.books.map((book) => {
+            let userBook = this.props.userBooks.find(x => x.id === book.id);
+            if (userBook) {
+                book.shelf = userBook.shelf
+            }
+
+            return book;
+        }
+        );
     }
 
     render() {
         const query = this.state.query;
-        const books = this.state.books;
+        const books = this.mergeWithUserBooks();
         console.log(books)
         return (
-            <div className="search-books">git 
+            <div className="search-books">git
                 <div className="search-books-bar">
                     <Link to='/' >
                         <button className="close-search">Close</button>
@@ -45,11 +56,14 @@ class Search extends Component {
                     <ol className="books-grid">
                         {
                             books.length > 0 ?
-                            books.map((book) => (
-                                <Book title={book.title} authors={book.authors} coverURL={book?.imageLinks?.thumbnail}  />)
-                            ) : ''
+                                books.map((book) => (
+                                    <Book
+                                        key={book.id}
+                                        book={book}
+                                        onChangeBookShelf={this.props.onChangeBookShelf} />)
+                                ) : ''
                         }
-                        </ol>
+                    </ol>
                 </div>
             </div>
         )
@@ -57,6 +71,8 @@ class Search extends Component {
 }
 
 Search.propTypes = {
+    userBooks: PropTypes.array.isRequired,
+    onChangeBookShelf: PropTypes.func.isRequired
 }
 
 export default Search;
